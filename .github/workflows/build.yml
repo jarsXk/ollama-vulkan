@@ -124,6 +124,11 @@ jobs:
             Select-Object FullName, Length |
             Format-Table -AutoSize
 
+      - name: Add startup script
+        shell: pwsh
+        run: |
+          Copy-Item "start-ollama.cmd" "dist\start-ollama.cmd"
+
       - name: Upload Ollama files
         uses: actions/upload-artifact@v4
         with:
