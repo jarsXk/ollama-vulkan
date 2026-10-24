@@ -105,18 +105,15 @@ jobs:
             Select-Object FullName, Length |
             Format-Table -AutoSize
 
-          $zip = Join-Path $env:GITHUB_WORKSPACE `
-            "ollama-windows-amd64-vulkan.zip"
+          Write-Host "Package contents:"
+          Get-ChildItem $dist -Recurse |
+            Select-Object FullName, Length |
+            Format-Table -AutoSize
 
-          Compress-Archive -Path "$dist\*" `
-            -DestinationPath $zip -Force
-
-          Get-FileHash $zip -Algorithm SHA256
-
-      - name: Upload ZIP artifact
+      - name: Upload Ollama files
         uses: actions/upload-artifact@v4
         with:
-          name: ollama-windows-amd64-vulkan
-          path: ollama-windows-amd64-vulkan.zip
+          name: ollama-vulkan-windows-amd64
+          path: dist/**
           if-no-files-found: error
           retention-days: 14
