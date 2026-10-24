@@ -23,6 +23,20 @@ jobs:
           repository: ollama/ollama
           ref: ${{ inputs.ollama_ref }}
           path: ollama
+          fetch-depth: 0
+
+      - name: Get Ollama version
+        id: ollama-version
+        shell: pwsh
+        run: |
+          $version = git -C ollama describe --tags --abbrev=0 2>$null
+
+          if (!$version) {
+            $version = git -C ollama rev-parse --short HEAD
+          }
+
+          "version=$version" >> $env:GITHUB_OUTPUT
+          Write-Host "Ollama version: $version"    
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -113,7 +127,7 @@ jobs:
       - name: Upload Ollama files
         uses: actions/upload-artifact@v4
         with:
-          name: ollama-vulkan-windows-amd64
+          name: ollama-vulkan-${{ steps.ollama-version.outputs.version }}-windows-amd64
           path: dist/**
           if-no-files-found: error
           retention-days: 14
