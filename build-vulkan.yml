@@ -1,0 +1,122 @@
+name: Build Ollama Vulkan for Windows
+
+on:
+  workflow_dispatch:
+    inputs:
+      ollama_ref:
+        description: "Ollama branch, tag or commit"
+        required: true
+        default: "main"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout upstream Ollama
+        uses: actions/checkout@v4
+        with:
+          repository: ollama/ollama
+          ref: ${{ inputs.ollama_ref }}
+          path: ollama
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ollama/go.mod
+          cache: false
+
+      - name: Install Vulkan SDK
+        shell: pwsh
+        run: |
+          choco install vulkan-sdk -y --no-progress
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Vulkan SDK installation failed"
+          }
+
+          $sdk = Get-ChildItem C:\VulkanSDK -Directory |
+            Sort-Object Name -Descending |
+            Select-Object -First 1
+
+          if (!$sdk) {
+            throw "Vulkan SDK directory not found"
+          }
+
+          "VULKAN_SDK=$($sdk.FullName)" |
+            Out-File $env:GITHUB_ENV -Append
+
+          "$($sdk.FullName)\Bin" |
+            Out-File $env:GITHUB_PATH -Append
+
+      - name: Configure Vulkan backend
+        working-directory: ollama
+        shell: pwsh
+        run: |
+          cmake -B build . `
+            -DOLLAMA_LLAMA_BACKENDS=vulkan
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "CMake configuration failed"
+          }
+
+      - name: Build Ollama
+        working-directory: ollama
+        shell: pwsh
+        run: |
+          cmake --build build --config Release --parallel 4
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Ollama build failed"
+          }
+
+      - name: Prepare package
+        working-directory: ollama
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          if (!(Test-Path ".\ollama.exe")) {
+            throw "ollama.exe was not produced by the build"
+          }
+
+          $dist = Join-Path $env:GITHUB_WORKSPACE "dist"
+          New-Item -ItemType Directory -Force $dist | Out-Null
+
+          Copy-Item ".\ollama.exe" "$dist\ollama.exe"
+
+          # Install the native runtime payload into the package.
+          cmake --install build --prefix "$dist"
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "CMake installation failed"
+          }
+
+          if (!(Test-Path "$dist\ollama.exe")) {
+            throw "ollama.exe missing from package"
+          }
+
+          Write-Host "Package contents:"
+          Get-ChildItem $dist -Recurse |
+            Select-Object FullName, Length |
+            Format-Table -AutoSize
+
+          $zip = Join-Path $env:GITHUB_WORKSPACE `
+            "ollama-windows-amd64-vulkan.zip"
+
+          Compress-Archive -Path "$dist\*" `
+            -DestinationPath $zip -Force
+
+          Get-FileHash $zip -Algorithm SHA256
+
+      - name: Upload ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ollama-windows-amd64-vulkan
+          path: ollama-windows-amd64-vulkan.zip
+          if-no-files-found: error
+          retention-days: 14
