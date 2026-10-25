@@ -18,7 +18,7 @@ ArchitecturesInstallIn64BitMode=x64
 UninstallDisplayName=Ollama Vulkan
 UninstallDisplayIcon={app}\ollama.exe
 
-OutputDir=..\..\packages
+OutputDir={#SourcePath}..\..\packages
 OutputBaseFilename=ollama-vulkan-{#MyAppVersion}-windows-amd64-setup
 
 Compression=lzma2
@@ -26,38 +26,18 @@ SolidCompression=yes
 WizardStyle=modern
 
 [Languages]
-Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; \
-    Description: "Создать ярлык на рабочем столе"; \
-    GroupDescription: "Дополнительные параметры:"; \
-    Flags: unchecked
-
-Name: "launch"; \
-    Description: "Запустить Ollama Vulkan после установки"; \
-    GroupDescription: "Дополнительные параметры:"; \
-    Flags: unchecked
+Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional options:"; Flags: unchecked
 
 [Files]
-Source: "..\..\dist\*"; \
-    DestDir: "{app}"; \
-    Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#SourcePath}..\..\dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{autoprograms}\Ollama Vulkan"; \
-    Filename: "{app}\start-ollama.cmd"; \
-    WorkingDir: "{app}"
-
-Name: "{autodesktop}\Ollama Vulkan"; \
-    Filename: "{app}\start-ollama.cmd"; \
-    WorkingDir: "{app}"; \
-    Tasks: desktopicon
+Name: "{autoprograms}\Ollama Vulkan"; Filename: "{app}\start-ollama.cmd"; WorkingDir: "{app}"
+Name: "{autodesktop}\Ollama Vulkan"; Filename: "{app}\start-ollama.cmd"; WorkingDir: "{app}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\start-ollama.cmd"; \
-    Description: "Запустить Ollama Vulkan"; \
-    WorkingDir: "{app}"; \
-    Flags: postinstall nowait skipifsilent; \
-    Tasks: launch
+Filename: "{app}\start-ollama.cmd"; Description: "Launch Ollama Vulkan"; WorkingDir: "{app}"; Flags: postinstall nowait skipifsilent
+

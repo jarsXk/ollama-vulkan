@@ -201,6 +201,14 @@ jobs:
 
           New-Item -ItemType Directory -Force "$env:GITHUB_WORKSPACE\packages" | Out-Null
 
+
+          Write-Host "Current directory: $(Get-Location)"
+          Write-Host "Installer script exists: $(Test-Path $script)"
+          Write-Host "Dist exists: $(Test-Path "$env:GITHUB_WORKSPACE\dist")"
+          Write-Host "Packages exists: $(Test-Path "$env:GITHUB_WORKSPACE\packages")"
+
+          Get-ChildItem "$env:GITHUB_WORKSPACE\build-repo\installer"
+
           & $iscc "/DMyAppVersion=$version" $script
 
           if ($LASTEXITCODE -ne 0) {
