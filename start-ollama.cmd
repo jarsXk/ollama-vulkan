@@ -4,7 +4,7 @@ setlocal
 cd /d "%~dp0"
 
 rem Store models folder
-set "OLLAMA_MODELS=%USERPROFILE%.ollama\models"
+set "OLLAMA_MODELS=%USERPROFILE%\.ollama\models"
 
 rem Listen address
 set "OLLAMA_HOST=127.0.0.1:11434"
