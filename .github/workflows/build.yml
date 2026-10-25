@@ -123,31 +123,6 @@ jobs:
           }
           Copy-Item $script (Join-Path $env:GITHUB_WORKSPACE "dist\start-ollama.cmd")
 
-#      - name: Create ZIP archive
-#        shell: pwsh
-#        run: |
-#          $ErrorActionPreference = "Stop"
-#          $version = "${{ steps.ollama-version.outputs.version }}"
-#          $archive = "packages\ollama-vulkan-$version-windows-amd64.zip"
-#          New-Item -ItemType Directory -Force packages | Out-Null
-#          Compress-Archive `
-#            -Path "dist\*" `
-#            -DestinationPath $archive `
-#            -CompressionLevel Optimal `
-#            -Force
-#          if (!(Test-Path $archive)) {
-#            throw "ZIP archive was not created"
-#          }
-#          Write-Host "Created archive: $archive"
-
-      - name: Install 7-Zip
-        shell: pwsh
-        run: |
-          choco install 7zip -y --no-progress
-          if ($LASTEXITCODE -ne 0) {
-            throw "7-Zip installation failed"
-          }
-
       - name: Create ZIP archive
         shell: pwsh
         run: |
@@ -155,14 +130,11 @@ jobs:
           $version = "${{ steps.ollama-version.outputs.version }}"
           $archive = "packages\ollama-vulkan-$version-windows-amd64.zip"
           New-Item -ItemType Directory -Force packages | Out-Null
-          $sevenZip = "${env:ProgramFiles}\7-Zip\7z.exe"
-          if (!(Test-Path $sevenZip)) {
-            throw "7-Zip executable not found: $sevenZip"
-          }
-          & $sevenZip a -tzip -mx=9 $archive ".\dist\*"
-          if ($LASTEXITCODE -ne 0) {
-            throw "ZIP archive creation failed"
-          }
+          Compress-Archive `
+            -Path "dist\*" `
+            -DestinationPath $archive `
+            -CompressionLevel Optimal `
+            -Force
           if (!(Test-Path $archive)) {
             throw "ZIP archive was not created"
           }
@@ -212,7 +184,7 @@ jobs:
       - name: Upload EXE installer
         uses: actions/upload-artifact@v4
         with:
-          name: ollama-vulkan-${{ steps.ollama-version.outputs.version }}-windows-amd64-setup
+          name: ollama-vulkan-${{ steps.ollama-version.outputs.version }}-windows-amd64
           path: packages/*.exe
           if-no-files-found: error
           retention-days: 14 
@@ -221,7 +193,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ollama-vulkan-${{ steps.ollama-version.outputs.version }}
-          name: Ollama Vulkan for Windows ${{ steps.ollama-version.outputs.version }}
+          name: ${{ steps.ollama-version.outputs.version }}
           body: |
             Windows x64 build of Ollama with Vulkan backend.
 
