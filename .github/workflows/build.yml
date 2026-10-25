@@ -148,14 +148,44 @@ jobs:
             throw "Inno Setup installation failed"
           }
 
+#      - name: Build EXE installer
+#        shell: pwsh
+#        run: |
+#          $ErrorActionPreference = "Stop"
+
+#          $version = "${{ steps.ollama-version.outputs.version }}"
+#          $script = "build-repo\installer\ollama-vulkan.iss"
+#          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+
+#          if (!(Test-Path $iscc)) {
+#            $iscc = "$env:ProgramFiles\Inno Setup 6\ISCC.exe"
+#          }
+
+#          if (!(Test-Path $iscc)) {
+#            throw "Inno Setup compiler not found"
+#          }
+
+#          & $iscc "/DMyAppVersion=$version" $script
+
+#          if ($LASTEXITCODE -ne 0) {
+#            throw "EXE installer build failed"
+#          }
       - name: Build EXE installer
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
 
           $version = "${{ steps.ollama-version.outputs.version }}"
-          $script = "build-repo\installer\ollama-vulkan.iss"
+          $script = Join-Path $env:GITHUB_WORKSPACE "build-repo\installer\ollama-vulkan.iss"
           $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+
+          Write-Host "Workspace: $env:GITHUB_WORKSPACE"
+          Write-Host "Installer script: $script"
+          Write-Host "Compiler: $iscc"
+
+          if (!(Test-Path $script)) {
+            throw "Installer script not found: $script"
+          }
 
           if (!(Test-Path $iscc)) {
             $iscc = "$env:ProgramFiles\Inno Setup 6\ISCC.exe"
@@ -165,11 +195,18 @@ jobs:
             throw "Inno Setup compiler not found"
           }
 
+          Write-Host "Checking dist directory:"
+          Get-ChildItem "$env:GITHUB_WORKSPACE\dist" -Recurse |
+            Select-Object FullName
+
+          New-Item -ItemType Directory -Force "$env:GITHUB_WORKSPACE\packages" | Out-Null
+
           & $iscc "/DMyAppVersion=$version" $script
 
           if ($LASTEXITCODE -ne 0) {
-            throw "EXE installer build failed"
+            throw "EXE installer build failed with exit code $LASTEXITCODE"
           }
+
 
       - name: Upload EXE installer
         uses: actions/upload-artifact@v4
