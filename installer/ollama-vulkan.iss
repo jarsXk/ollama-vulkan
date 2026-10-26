@@ -24,12 +24,14 @@ OutputBaseFilename=ollama-vulkan-{#MyAppVersion}-windows-amd64
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
+ChangesEnvironment=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional options:"; Flags: unchecked
+Name: "modifypath"; Description: "Add Ollama Vulkan to user PATH"; Flags: unchecked
 
 [Files]
 Source: "{#SourcePath}..\..\dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
