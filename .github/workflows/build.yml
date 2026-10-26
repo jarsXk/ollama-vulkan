@@ -113,15 +113,28 @@ jobs:
             Select-Object FullName, Length |
             Format-Table -AutoSize
 
-      - name: Add startup script
+      - name: Add startup scripts
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
-          $script = Join-Path $env:GITHUB_WORKSPACE "build-repo\start-ollama.cmd"
-          if (!(Test-Path $script)) {
-            throw "Startup script not found: $script"
+          $repo = Join-Path $env:GITHUB_WORKSPACE "build-repo"
+          $dist = Join-Path $env:GITHUB_WORKSPACE "dist"
+
+          $scripts = @(
+            "start-ollama.cmd",
+            "start-ollama-hidden.vbs"
+          )
+
+          foreach ($name in $scripts) {
+            $source = Join-Path $repo $name
+
+            if (!(Test-Path $source)) {
+              throw "Startup script not found: $source"
+            }
+
+            Copy-Item $source (Join-Path $dist $name)
+            Write-Host "Added startup script: $name"
           }
-          Copy-Item $script (Join-Path $env:GITHUB_WORKSPACE "dist\start-ollama.cmd")
 
       - name: Create ZIP archive
         shell: pwsh
