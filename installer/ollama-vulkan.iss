@@ -33,7 +33,6 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "modifypath"; Description: "Add Ollama Vulkan to user PATH"
-Name: "autostart"; Description: "Start Ollama Vulkan when I log on to Windows"
 Name: "startmenu"; Description: "Create a Start Menu shortcut"; GroupDescription: "Additional options:"
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional options:"; Flags: unchecked
 
@@ -41,15 +40,15 @@ Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription:
 Source: "{#SourcePath}..\..\dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{autoprograms}\Ollama Vulkan"; Filename: "{app}\start-ollama.cmd"; WorkingDir: "{app}"; Tasks: startmenu
+Name: "{group}\Ollama Vulkan"; Filename: "{app}\start-ollama.cmd"; WorkingDir: "{app}"; Tasks: startmenu
 Name: "{autodesktop}\Ollama Vulkan"; Filename: "{app}\start-ollama.cmd"; WorkingDir: "{app}"; Tasks: desktopicon
-Name: "{userstartup}\Ollama Vulkan"; Filename: "{sys}\wscript.exe"; Parameters: """{app}\start-ollama-hidden.vbs"""; WorkingDir: "{app}"; Tasks: autostart
 
 [Run]
 Filename: "{app}\start-ollama.cmd"; Description: "Launch Ollama Vulkan"; WorkingDir: "{app}"; Flags: postinstall nowait skipifsilent
 
 [InstallDelete]
 Type: files; Name: "{userstartup}\Ollama Vulkan.lnk"
+Type: files; Name: "{app}\start-ollama-hidden.vbs"
 
 [Code]
 const
@@ -58,40 +57,85 @@ const
 
 var
   GroupNameEdit: TNewEdit;
+  StartMenuCheck: TNewCheckBox;
+  ModifyPathCheck: TNewCheckBox;
+  DesktopIconCheck: TNewCheckBox;
+  GroupNameLabel: TNewStaticText;
+
+procedure StartMenuCheckClick(Sender: TObject);
+begin
+  GroupNameEdit.Enabled := StartMenuCheck.Checked;
+  GroupNameLabel.Enabled := StartMenuCheck.Checked;
+end;
 
 procedure InitializeWizard;
-var
-  GroupNameLabel: TNewStaticText;
 begin
-  WizardForm.TasksList.Height :=
-    WizardForm.TasksList.Height - ScaleY(58);
+  WizardForm.TasksList.Visible := False;
+
+  StartMenuCheck := TNewCheckBox.Create(WizardForm);
+  StartMenuCheck.Parent := WizardForm.TasksList.Parent;
+  StartMenuCheck.Left := WizardForm.TasksList.Left;
+  StartMenuCheck.Top := WizardForm.TasksList.Top;
+  StartMenuCheck.Width := WizardForm.TasksList.Width;
+  StartMenuCheck.Caption := 'Create a Start Menu shortcut';
+  StartMenuCheck.Checked := IsTaskSelected('startmenu');
 
   GroupNameLabel := TNewStaticText.Create(WizardForm);
   GroupNameLabel.Parent := WizardForm.TasksList.Parent;
   GroupNameLabel.Caption := 'Start Menu folder name:';
-  GroupNameLabel.Left := WizardForm.TasksList.Left;
-  GroupNameLabel.Top :=
-    WizardForm.TasksList.Top + WizardForm.TasksList.Height + ScaleY(8);
+  GroupNameLabel.Left := StartMenuCheck.Left;
+  GroupNameLabel.Top := StartMenuCheck.Top + ScaleY(24);
 
   GroupNameEdit := TNewEdit.Create(WizardForm);
   GroupNameEdit.Parent := WizardForm.TasksList.Parent;
-  GroupNameEdit.Left := WizardForm.TasksList.Left;
+  GroupNameEdit.Left := StartMenuCheck.Left;
   GroupNameEdit.Top := GroupNameLabel.Top + GroupNameLabel.Height + ScaleY(4);
-  GroupNameEdit.Width := WizardForm.TasksList.Width;
+  GroupNameEdit.Width := StartMenuCheck.Width;
   GroupNameEdit.Text := 'Ollama Vulkan';
+  GroupNameEdit.Enabled := StartMenuCheck.Checked;
+  GroupNameLabel.Enabled := StartMenuCheck.Checked;
+  StartMenuCheck.OnClick := @StartMenuCheckClick;
+
+  ModifyPathCheck := TNewCheckBox.Create(WizardForm);
+  ModifyPathCheck.Parent := WizardForm.TasksList.Parent;
+  ModifyPathCheck.Left := StartMenuCheck.Left;
+  ModifyPathCheck.Top := GroupNameEdit.Top + GroupNameEdit.Height + ScaleY(8);
+  ModifyPathCheck.Width := StartMenuCheck.Width;
+  ModifyPathCheck.Caption := 'Add Ollama Vulkan to user PATH';
+  ModifyPathCheck.Checked := IsTaskSelected('modifypath');
+
+  DesktopIconCheck := TNewCheckBox.Create(WizardForm);
+  DesktopIconCheck.Parent := WizardForm.TasksList.Parent;
+  DesktopIconCheck.Left := StartMenuCheck.Left;
+  DesktopIconCheck.Top := ModifyPathCheck.Top + ScaleY(24);
+  DesktopIconCheck.Width := StartMenuCheck.Width;
+  DesktopIconCheck.Caption := 'Create a desktop shortcut';
+  DesktopIconCheck.Checked := IsTaskSelected('desktopicon');
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   Result := True;
   if CurPageID = wpSelectTasks then begin
-    if IsTaskSelected('startmenu') then begin
+    if StartMenuCheck.Checked then begin
       if Trim(GroupNameEdit.Text) = '' then begin
         MsgBox('Enter a Start Menu folder name.', mbError, MB_OK);
         Result := False;
-      end else
+      end else begin
         WizardForm.GroupEdit.Text := Trim(GroupNameEdit.Text);
+        WizardSelectTasks('startmenu');
+      end;
+    end else begin
+      WizardSelectTasks('!startmenu');
     end;
+    if ModifyPathCheck.Checked then
+      WizardSelectTasks('modifypath')
+    else
+      WizardSelectTasks('!modifypath');
+    if DesktopIconCheck.Checked then
+      WizardSelectTasks('desktopicon')
+    else
+      WizardSelectTasks('!desktopicon');
   end;
 end;
 

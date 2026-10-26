@@ -113,7 +113,7 @@ jobs:
             Select-Object FullName, Length |
             Format-Table -AutoSize
 
-      - name: Add startup scripts
+      - name: Add startup script
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
@@ -121,8 +121,7 @@ jobs:
           $dist = Join-Path $env:GITHUB_WORKSPACE "dist"
 
           $scripts = @(
-            "start-ollama.cmd",
-            "start-ollama-hidden.vbs"
+            "start-ollama.cmd"
           )
 
           foreach ($name in $scripts) {

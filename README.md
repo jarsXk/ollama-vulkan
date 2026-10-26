@@ -13,21 +13,16 @@ are based on the upstream Ollama tag, or the commit hash if no tag is available.
 ## Install
 
 Run the downloaded EXE installer and follow its prompts. The installer can
-create Start Menu and desktop shortcuts, add the install directory to your
-user `PATH`, and start Ollama when you sign in to Windows. These options and
-the Start Menu folder name are configured together on one installer page. The
-desktop shortcut is not selected by default.
+create Start Menu and desktop shortcuts and add the install directory to your
+user `PATH`. Configure these options and the Start Menu folder name together
+on one installer page. The desktop shortcut is not selected by default.
 
 Alternatively, extract the portable ZIP to a folder and run
-`start-ollama.cmd`. The portable package does not add itself to `PATH` or
-configure automatic startup.
+`start-ollama.cmd`. The portable package does not add itself to `PATH`.
 
 ## Run
 
 `start-ollama.cmd` starts `ollama.exe serve` in a minimized command window.
-To start it without a visible window, run `start-ollama-hidden.vbs`. Hidden
-launches write standard output and errors to `logs\ollama.log` beside the
-scripts.
 
 The server listens on `127.0.0.1:11434`, so it is available only from the
 local machine by default. Models are stored in
@@ -48,7 +43,7 @@ the installer option to add Ollama to `PATH`, you can use `ollama` instead.
 
 The Windows x64 build uses Go and the Vulkan SDK. CMake is configured with
 `OLLAMA_LLAMA_BACKENDS=vulkan`; the resulting package contains the executable,
-native runtime payload, and startup scripts.
+native runtime payload, and launcher script.
 
 ## Runtime settings
 
