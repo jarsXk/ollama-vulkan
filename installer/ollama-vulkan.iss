@@ -32,14 +32,15 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "modifypath"; Description: "Add Ollama Vulkan to user PATH"
-Name: "autostart"; Description: "Start Ollama Vulkan when I log on to Windows"; GroupDescription: "Additional options:"
+Name: "autostart"; Description: "Start Ollama Vulkan when I log on to Windows"
+Name: "startmenu"; Description: "Create a Start Menu shortcut"; GroupDescription: "Additional options:"
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional options:"; Flags: unchecked
 
 [Files]
 Source: "{#SourcePath}..\..\dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{autoprograms}\Ollama Vulkan"; Filename: "{app}\start-ollama.cmd"; WorkingDir: "{app}"
+Name: "{autoprograms}\Ollama Vulkan"; Filename: "{app}\start-ollama.cmd"; WorkingDir: "{app}"; Tasks: startmenu
 Name: "{autodesktop}\Ollama Vulkan"; Filename: "{app}\start-ollama.cmd"; WorkingDir: "{app}"; Tasks: desktopicon
 Name: "{userstartup}\Ollama Vulkan"; Filename: "{sys}\wscript.exe"; Parameters: """{app}\start-ollama-hidden.vbs"""; WorkingDir: "{app}"; Tasks: autostart
 
