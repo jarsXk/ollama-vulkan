@@ -20,7 +20,7 @@ UninstallDisplayName=Ollama Vulkan
 UninstallDisplayIcon={app}\ollama.exe
 
 OutputDir={#SourcePath}..\..\packages
-OutputBaseFilename=ollama-vulkan-{#MyAppVersion}-windows-amd64
+OutputBaseFilename=ollama-vulkan-{#MyAppVersion}-win-amd64
 
 Compression=lzma2
 SolidCompression=yes
@@ -61,6 +61,7 @@ var
   ModifyPathCheck: TNewCheckBox;
   DesktopIconCheck: TNewCheckBox;
   GroupNameLabel: TNewStaticText;
+  ShortcutsLabel: TNewStaticText;
 
 procedure StartMenuCheckClick(Sender: TObject);
 begin
@@ -72,11 +73,26 @@ procedure InitializeWizard;
 begin
   WizardForm.TasksList.Visible := False;
 
+  ModifyPathCheck := TNewCheckBox.Create(WizardForm);
+  ModifyPathCheck.Parent := WizardForm.TasksList.Parent;
+  ModifyPathCheck.Left := WizardForm.TasksList.Left;
+  ModifyPathCheck.Top := WizardForm.TasksList.Top;
+  ModifyPathCheck.Width := WizardForm.TasksList.Width;
+  ModifyPathCheck.Caption := 'Add Ollama Vulkan to user PATH';
+  ModifyPathCheck.Checked := IsTaskSelected('modifypath');
+
+  ShortcutsLabel := TNewStaticText.Create(WizardForm);
+  ShortcutsLabel.Parent := WizardForm.TasksList.Parent;
+  ShortcutsLabel.Left := ModifyPathCheck.Left;
+  ShortcutsLabel.Top := ModifyPathCheck.Top + ScaleY(32);
+  ShortcutsLabel.Caption := 'Shortcuts';
+  ShortcutsLabel.Font.Style := [fsBold];
+
   StartMenuCheck := TNewCheckBox.Create(WizardForm);
   StartMenuCheck.Parent := WizardForm.TasksList.Parent;
-  StartMenuCheck.Left := WizardForm.TasksList.Left;
-  StartMenuCheck.Top := WizardForm.TasksList.Top;
-  StartMenuCheck.Width := WizardForm.TasksList.Width;
+  StartMenuCheck.Left := ModifyPathCheck.Left;
+  StartMenuCheck.Top := ShortcutsLabel.Top + ShortcutsLabel.Height + ScaleY(4);
+  StartMenuCheck.Width := ModifyPathCheck.Width;
   StartMenuCheck.Caption := 'Create a Start Menu shortcut';
   StartMenuCheck.Checked := IsTaskSelected('startmenu');
 
@@ -84,7 +100,7 @@ begin
   GroupNameLabel.Parent := WizardForm.TasksList.Parent;
   GroupNameLabel.Caption := 'Start Menu folder name:';
   GroupNameLabel.Left := StartMenuCheck.Left;
-  GroupNameLabel.Top := StartMenuCheck.Top + ScaleY(24);
+  GroupNameLabel.Top := StartMenuCheck.Top + StartMenuCheck.Height + ScaleY(4);
 
   GroupNameEdit := TNewEdit.Create(WizardForm);
   GroupNameEdit.Parent := WizardForm.TasksList.Parent;
@@ -96,18 +112,10 @@ begin
   GroupNameLabel.Enabled := StartMenuCheck.Checked;
   StartMenuCheck.OnClick := @StartMenuCheckClick;
 
-  ModifyPathCheck := TNewCheckBox.Create(WizardForm);
-  ModifyPathCheck.Parent := WizardForm.TasksList.Parent;
-  ModifyPathCheck.Left := StartMenuCheck.Left;
-  ModifyPathCheck.Top := GroupNameEdit.Top + GroupNameEdit.Height + ScaleY(8);
-  ModifyPathCheck.Width := StartMenuCheck.Width;
-  ModifyPathCheck.Caption := 'Add Ollama Vulkan to user PATH';
-  ModifyPathCheck.Checked := IsTaskSelected('modifypath');
-
   DesktopIconCheck := TNewCheckBox.Create(WizardForm);
   DesktopIconCheck.Parent := WizardForm.TasksList.Parent;
   DesktopIconCheck.Left := StartMenuCheck.Left;
-  DesktopIconCheck.Top := ModifyPathCheck.Top + ScaleY(24);
+  DesktopIconCheck.Top := GroupNameEdit.Top + GroupNameEdit.Height + ScaleY(8);
   DesktopIconCheck.Width := StartMenuCheck.Width;
   DesktopIconCheck.Caption := 'Create a desktop shortcut';
   DesktopIconCheck.Checked := IsTaskSelected('desktopicon');

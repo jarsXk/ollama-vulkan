@@ -140,7 +140,7 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
           $version = "${{ steps.ollama-version.outputs.version }}"
-          $archive = "packages\ollama-vulkan-$version-windows-amd64.zip"
+          $archive = "packages\ollama-vulkan-$version-win-amd64.zip"
           New-Item -ItemType Directory -Force packages | Out-Null
           Compress-Archive `
             -Path "dist\*" `
@@ -155,7 +155,7 @@ jobs:
       - name: Upload ZIP archive
         uses: actions/upload-artifact@v4
         with:
-          name: ollama-vulkan-${{ steps.ollama-version.outputs.version }}-windows-amd64-portable
+          name: ollama-vulkan-${{ steps.ollama-version.outputs.version }}-win-amd64
           path: packages/*.zip
           if-no-files-found: error
           retention-days: 14          
@@ -196,7 +196,7 @@ jobs:
       - name: Upload EXE installer
         uses: actions/upload-artifact@v4
         with:
-          name: ollama-vulkan-${{ steps.ollama-version.outputs.version }}-windows-amd64
+          name: ollama-vulkan-${{ steps.ollama-version.outputs.version }}-win-amd64
           path: packages/*.exe
           if-no-files-found: error
           retention-days: 14 
