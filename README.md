@@ -14,8 +14,9 @@ are based on the upstream Ollama tag, or the commit hash if no tag is available.
 
 Run the downloaded EXE installer and follow its prompts. The installer can
 create Start Menu and desktop shortcuts, add the install directory to your
-user `PATH`, and start Ollama when you sign in to Windows. The desktop shortcut
-is not selected by default.
+user `PATH`, and start Ollama when you sign in to Windows. These options and
+the Start Menu folder name are configured together on one installer page. The
+desktop shortcut is not selected by default.
 
 Alternatively, extract the portable ZIP to a folder and run
 `start-ollama.cmd`. The portable package does not add itself to `PATH` or

@@ -10,6 +10,7 @@ AppPublisher=jarsXk
 
 DefaultDirName={localappdata}\Programs\Ollama Vulkan
 DefaultGroupName=Ollama Vulkan
+DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
 
 ArchitecturesAllowed=x64
@@ -55,6 +56,45 @@ const
   ModPathName = 'modifypath';
   ModPathType = 'user';
 
+var
+  GroupNameEdit: TNewEdit;
+
+procedure InitializeWizard;
+var
+  GroupNameLabel: TNewStaticText;
+begin
+  WizardForm.TasksList.Height :=
+    WizardForm.TasksList.Height - ScaleY(58);
+
+  GroupNameLabel := TNewStaticText.Create(WizardForm);
+  GroupNameLabel.Parent := WizardForm.TasksList.Parent;
+  GroupNameLabel.Caption := 'Start Menu folder name:';
+  GroupNameLabel.Left := WizardForm.TasksList.Left;
+  GroupNameLabel.Top :=
+    WizardForm.TasksList.Top + WizardForm.TasksList.Height + ScaleY(8);
+
+  GroupNameEdit := TNewEdit.Create(WizardForm);
+  GroupNameEdit.Parent := WizardForm.TasksList.Parent;
+  GroupNameEdit.Left := WizardForm.TasksList.Left;
+  GroupNameEdit.Top := GroupNameLabel.Top + GroupNameLabel.Height + ScaleY(4);
+  GroupNameEdit.Width := WizardForm.TasksList.Width;
+  GroupNameEdit.Text := 'Ollama Vulkan';
+end;
+
+function NextButtonClick(CurPageID: Integer): Boolean;
+begin
+  Result := True;
+  if CurPageID = wpSelectTasks then begin
+    if IsTaskSelected('startmenu') then begin
+      if Trim(GroupNameEdit.Text) = '' then begin
+        MsgBox('Enter a Start Menu folder name.', mbError, MB_OK);
+        Result := False;
+      end else
+        WizardForm.GroupEdit.Text := Trim(GroupNameEdit.Text);
+    end;
+  end;
+end;
+
 function ModPathDir(): TArrayOfString;
 begin
   SetArrayLength(Result, 1);
@@ -62,4 +102,3 @@ begin
 end;
 
 #include "modpath.iss"
-
