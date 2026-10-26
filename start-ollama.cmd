@@ -15,7 +15,16 @@ set "OLLAMA_CONTEXT_LENGTH=8192"
 rem Unload models after N minutes of inactivity
 set "OLLAMA_KEEP_ALIVE=5m"
 
-rem Запуск сервера Ollama в фоне
-start "Ollama Vulkan" /min "%~dp0ollama.exe" serve
+if /i "%~1"=="/hidden" goto hidden
 
+rem Normal launch: minimized window
+start "Ollama Vulkan" /min "%~dp0ollama.exe" serve
+goto end
+
+:hidden
+rem Hidden launch: save stdout and stderr to a log file
+if not exist "%~dp0logs" mkdir "%~dp0logs"
+"%~dp0ollama.exe" serve >> "%~dp0logs\ollama.log" 2>&1
+
+:end
 endlocal
