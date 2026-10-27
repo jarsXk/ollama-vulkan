@@ -20,7 +20,7 @@ UninstallDisplayName=Ollama Vulkan
 UninstallDisplayIcon={app}\ollama.exe
 
 OutputDir={#SourcePath}..\..\packages
-OutputBaseFilename=ollama-vulkan-{#MyAppVersion}-win-amd64
+OutputBaseFilename=ollama-vulkan-{#MyAppVersion}-win-amd64-setup
 
 Compression=lzma2
 SolidCompression=yes
