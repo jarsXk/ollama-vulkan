@@ -1,14 +1,11 @@
 # Ollama Vulkan for Windows
 
-This project builds [Ollama](https://github.com/ollama/ollama) for Windows
-x64 with the Vulkan backend enabled. Each release includes a portable ZIP
-archive and a Windows installer.
+This project builds [Ollama](https://github.com/ollama/ollama) for Windows x64 with the Vulkan backend enabled.
 
 ## Download
 
-Download the latest portable ZIP or EXE installer from the project's
-[Releases](https://github.com/jarsXk/ollama-vulkan/releases). Release versions
-are based on the upstream Ollama tag, or the commit hash if no tag is available.
+Download the latest portable ZIP or EXE installer from the project's [Releases](https://github.com/jarsXk/ollama-vulkan/releases). 
+Release versions are based on the upstream Ollama tag.
 
 ## Install
 
