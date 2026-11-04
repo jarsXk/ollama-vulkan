@@ -4,8 +4,9 @@ This project builds [Ollama](https://github.com/ollama/ollama) for Windows x64 w
 
 ## Download
 
-Download the latest portable ZIP or EXE installer from the project's [Releases](https://github.com/jarsXk/ollama-vulkan/releases). 
-Release versions are based on the upstream Ollama tag.
+Download the latest portable ZIP or EXE installer from the project's [Releases](https://github.com/jarsXk/ollama-vulkan/releases).
+Each build automatically selects the latest stable upstream Ollama version
+tag. Prerelease tags (such as `-rc0`) are ignored.
 
 ## Install
 

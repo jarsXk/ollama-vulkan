@@ -2,12 +2,6 @@ name: Build Ollama Vulkan for Windows
 
 on:
   workflow_dispatch:
-    inputs:
-      ollama_ref:
-        description: "Ollama branch, tag or commit"
-        required: true
-        default: "main"
-        type: string
 
 permissions:
   contents: write
@@ -27,20 +21,35 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ollama/ollama
-          ref: ${{ inputs.ollama_ref }}
           path: ollama
           fetch-depth: 0
 
-      - name: Get Ollama version
+      - name: Select latest stable Ollama release
         id: ollama-version
         shell: pwsh
         run: |
-          $version = git -C ollama describe --tags --abbrev=0 2>$null
-          if (!$version) {
-            $version = git -C ollama rev-parse --short HEAD
+          $stableTags = @(
+            git -C ollama tag --list | ForEach-Object {
+              if ($_ -match '^v?(?<version>\d+\.\d+\.\d+)$') {
+                [PSCustomObject]@{
+                  Tag = $_
+                  Version = [version]$Matches.version
+                }
+              }
+            }
+          )
+          $latest = $stableTags |
+            Sort-Object Version -Descending |
+            Select-Object -First 1
+          if (!$latest) {
+            throw "No stable Ollama release tags were found."
           }
-          "version=$version" >> $env:GITHUB_OUTPUT
-          Write-Host "Ollama version: $version"    
+          git -C ollama checkout --detach $latest.Tag
+          if ($LASTEXITCODE -ne 0) {
+            throw "Failed to check out Ollama release tag $($latest.Tag)."
+          }
+          "version=$($latest.Tag)" >> $env:GITHUB_OUTPUT
+          Write-Host "Selected stable Ollama release: $($latest.Tag)"
 
       - name: Set up Go
         uses: actions/setup-go@v5
